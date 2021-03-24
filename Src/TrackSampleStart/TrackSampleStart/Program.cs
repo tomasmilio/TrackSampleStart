@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.IO;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -51,70 +53,48 @@ namespace TrackSampleStart
 
     //Track 1:
 
-    //09:00AM Writing Fast Tests Against Enterprise Rails 60min
-    //10:00AM Overdoing it in Python 45min
-    //10:45AM Lua for the Masses 30min
-    //11:15AM Ruby Errors from Mismatched Gem Versions 45min
-    //12:00PM Lunch
-    //01:00PM Ruby on Rails: Why We Should Move On 60min
-    //02:00PM Common Ruby Errors 45min
-    //02:45PM Pair Programming vs Noise 45min
-    //03:30PM Programming in the Boondocks of Seattle 30min
-    //04:00PM Ruby vs.Clojure for Back-End Development 30min
-    //04:30PM User Interface CSS in Rails Apps 30min
-    //05:00PM Networking Event
+    // 09:00AM Writing Fast Tests Against Enterprise Rails 60min
+    // 10:00AM Overdoing it in Python 45min
+    // 10:45AM Lua for the Masses 30min
+    // 11:15AM Ruby Errors from Mismatched Gem Versions 45min
+    // 12:00PM Lunch
+    // 01:00PM Ruby on Rails: Why We Should Move On 60min
+    // 02:00PM Common Ruby Errors 45min
+    // 02:45PM Pair Programming vs Noise 45min
+    // 03:30PM Programming in the Boondocks of Seattle 30min
+    // 04:00PM Ruby vs.Clojure for Back-End Development 30min
+    // 04:30PM User Interface CSS in Rails Apps 30min
+    // 05:00PM Networking Event
 
     //Track 2:
 
-    //09:00AM Communicating Over Distance 60min
-    //10:00AM Rails Magic 60min
-    //11:00AM Woah 30min
-    //11:30AM Sit Down and Write 30min
-    //12:00PM Lunch
-    //01:00PM Accounting-Driven Development 45min
-    //01:45PM Clojure Ate Scala (on my project) 45min
-    //02:30PM A World Without HackerNews 30min
-    //03:00PM Ruby on Rails Legacy App Maintenance 60min
-    //04:00PM Rails for Python Developers lightning
-    //05:00PM Networking Event
+    // 09:00AM Communicating Over Distance 60min
+    // 10:00AM Rails Magic 60min
+    // 11:00AM Woah 30min
+    // 11:30AM Sit Down and Write 30min
+    // 12:00PM Lunch
+    // 01:00PM Accounting-Driven Development 45min
+    // 01:45PM Clojure Ate Scala (on my project) 45min
+    // 02:30PM A World Without HackerNews 30min
+    // 03:00PM Ruby on Rails Legacy App Maintenance 60min
+    // 04:00PM Rails for Python Developers lightning
+    // 05:00PM Networking Event
 
     class Program
     {
-        private static List<string> _inputList = new List<string>()
-        {
-           "Writing Fast Tests Against Enterprise Rails 60min",
-           "Overdoing it in Python 45min",
-           "Lua for the Masses 30min",
-           "Ruby Errors from Mismatched Gem Versions 45min",
-           "Common Ruby Errors 45min",
-           "Communicating Over Distance 60min",
-           "Accounting-Driven Development 45min",
-           "Woah 30min",
-           "Sit Down and Write 30min",
-           "Pair Programming vs Noise 45min",
-           "Rails Magic 60min",
-           "Ruby on Rails: Why We Should Move On 60min",
-           "Clojure Ate Scala(on my project) 45min",
-           "Programming in the Boondocks of Seattle 30min",
-           "Ruby vs.Clojure for Back-End Development 30min",
-           "Ruby on Rails Legacy App Maintenance 60min",
-           "A World Without HackerNews 30min",
-           "User Interface CSS in Rails Apps 30min",
-           "Rails for Python Developers lightning",
-        };
-
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
 
+            var talks = ReadFile(Path.Combine(new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName, "talks.txt"));
 
             var time = new TimeSpan(9, 0, 0);
-            DateTime formatTime;
-            int teller = 0;
-            foreach (var input in _inputList)
+            var teller = 0;
+            foreach (var input in talks)
             {
                 var inputTime = MinuteParser(input) ?? LightningParser(input);
 
+                DateTime formatTime;
                 if (time.Add(inputTime.Value).Hours == 12)
                 {
                     time = new TimeSpan(12, 0, 0);
@@ -136,7 +116,7 @@ namespace TrackSampleStart
                 time = time.Add(inputTime.Value);
                 teller++;
 
-                if (teller == _inputList.Count)
+                if (teller == talks.Count)
                 {
                     time = new TimeSpan(time.Hours >= 17 ? 17 : 16, 0, 0);
                     formatTime = DateTime.Today.Add(time);
@@ -175,6 +155,21 @@ namespace TrackSampleStart
             }
 
             return null;
+        }
+
+        private static List<string> ReadFile(string fileLocation)
+        {
+            var talks = new List<string>();
+
+            using var sr = new StreamReader(fileLocation);
+
+            while (!sr.EndOfStream)
+            {
+                var line = sr.ReadLine();
+                talks.Add(line);
+            }
+
+            return talks;
         }
     }
 }
